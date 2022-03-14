@@ -15,7 +15,7 @@ while True:
     print('Jugador 1 ¡CONECTADO!')
     print(f'Direccion: {addr}')
     conn.send('J1'.encode())#envía un mensaje fijo#envía un mensaje fijo
-    print('Esperano segundo jugador')
+    print('Esperando segundo jugador')
     conn2, addr2 = s.accept() #establecemos la conexion
     print('Jugador 2 ¡CONECTADO!')
     print(f'Direccion: {addr2}')
