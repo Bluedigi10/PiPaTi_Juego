@@ -5,6 +5,41 @@ s = socket()
 host = 'localhost'
 port = 9999
 
+#declaración de contadores de record globales:
+globalGanado1=globalPerdido2=0
+globalPerdido1=globalGanado2=0
+globalEmpatado=0
+#declaración de contadores de record de partida actuales:
+actualEmpatado=0
+actualGanado1=actualPerdido2=0
+actualPerdido1=actualGanado2=0
+
+#funcion empate para enviar mensajes de empate e incrementar los contadores
+def empate(): 
+    conn.send('Empate'.encode()) #se envía mensaje al jugador 1
+    conn2.send('Empate'.encode()) #se envía mensaje al jugador 2
+    globalEmpatado+=1 #se incrementa el contador de record global en 1
+    actualEmpatado+=1 #se incrementa el contador de rcord de partida actual en 1
+
+#funcion para enviar mensajes de "Perdiste" a jugador 1 e incrementar los contadores
+def pierdeJugador1():
+    conn.send('Perdiste'.encode()) #se envía mensaje al jugador 1
+    conn2.send('Ganaste'.encode()) #se envía mensaje al jugador 2
+    globalPerdido1+=1 #se incrementa en 1 el contador global perdido para jugador 1
+    globalGanado2+=1 #se incrementa en 1 el contador global ganado para jugador 2
+    actualPerdido1+=1 #se incrementa en 1 el contador de partida actual de perdido para jugador 1
+    actualGanado2+=1 #se incrementa en 1 el contador de partida actual de ganado para jugador 2
+
+#funcion para enviar mensajes de "Ganaste" a jugador 1 e incrementar los contadores
+def ganasteJugador1():
+     conn.send('Ganaste'.encode()) #se envía mensaje al jugador 1
+     conn2.send('Perdiste'.encode()) #se envía mensaje al jugador 2
+     globalGanado1+=1 #se incrementa en 1 el contador global ganado para jugador 1
+     globalPerdido2+=1 #se incrementa en 1 el contador global perdido para jugador 2
+     actualGanado1+=1 #se incrementa en 1 el contador de partida actual de ganado para jugador 1
+     actualPerdido2+=1 #se incrementa en 1 el contador de partida actual de perdido para jugador 2
+
+
 s.bind((host, port))
 print('Esperando conexion')
 s.listen(2)
@@ -44,29 +79,22 @@ while True:
             print(f'Jugador 2: {mensajeRecibido2}')
     
         if mensajeRecibido1 == mensajeRecibido2:    
-            conn.send('Empate'.encode()) #se envía mensaje al jugador 1
-            conn2.send('Empate'.encode()) #se envía mensaje al jugador 2
+            empate() #llamado a función empate()
 
         if mensajeRecibido1 == 'piedra' and mensajeRecibido2 == 'papel':    
-            conn.send('Perdiste'.encode()) #se envía mensaje al jugador 1
-            conn2.send('Ganaste'.encode()) #se envía mensaje al jugador 2
+            pierdeJugador1() #llamado a función pierdeJugador1()
         elif mensajeRecibido1 == 'piedra' and mensajeRecibido2 == 'tijera':
-            conn.send('Ganaste'.encode()) #se envía mensaje al jugador 1
-            conn2.send('Perdiste'.encode()) #se envía mensaje al jugador 2
-    
+            ganasteJugador1() #llamado a función ganasteJugador1()
+            
         if mensajeRecibido1 == 'papel' and mensajeRecibido2== 'tijera':
-            conn.send('Perdiste'.encode()) #se envía mensaje al jugador 1
-            conn2.send('Ganaste'.encode()) #se envía mensaje al jugador 2
+            pierdeJugador1() #llamado a función pierdeJugador1()
         elif mensajeRecibido1 == 'papel' and mensajeRecibido2 == 'piedra':
-            conn.send('Ganaste'.encode()) #se envía mensaje al jugador 1
-            conn2.send('Perdiste'.encode()) #se envía mensaje al jugador 2
+            ganasteJugador1() #llamado a función ganasteJugador1()
 
         if mensajeRecibido1 == 'tijera' and mensajeRecibido2 == 'piedra':
-            conn.send('Perdiste'.encode()) #se envía mensaje al jugador 1
-            conn2.send('Ganaste'.encode()) #se envía mensaje al jugador 2
+            pierdeJugador1() #llamado a función pierdeJugador1()
         elif mensajeRecibido1 == 'tijera' and mensajeRecibido2 == 'papel': 
-            conn.send('Ganaste'.encode()) #se envía mensaje al jugador 1
-            conn2.send('Perdiste'.encode()) #se envía mensaje al jugador 2
+            ganasteJugador1() #llamado a función ganasteJugador1()
   
     # print(f'Desconectando al cliente 1: {addr}')
     # print(f'Desconectando al cliente 2: {addr2}')
