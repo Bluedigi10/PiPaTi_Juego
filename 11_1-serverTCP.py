@@ -1,4 +1,3 @@
-
 from socket import AF_INET, SOCK_STREAM, socket
 
 s = socket()
@@ -32,24 +31,24 @@ while True:
             conn.send('Empate'.encode()) #se envía mensaje al jugador 1
             conn2.send('Empate'.encode()) #se envía mensaje al jugador 2
 
-        if mensajeRecibido1 == 'piedra' and mensajeRecibido2 == 'papel':    
+        if mensajeRecibido1 == 'Piedra' and mensajeRecibido2 == 'Papel':    
             conn.send('Perdiste'.encode()) #se envía mensaje al jugador 1
             conn2.send('Ganaste'.encode()) #se envía mensaje al jugador 2
-        elif mensajeRecibido1 == 'piedra' and mensajeRecibido2 == 'tijera':
+        elif mensajeRecibido1 == 'Piedra' and mensajeRecibido2 == 'Tijera':
             conn.send('Ganaste'.encode()) #se envía mensaje al jugador 1
             conn2.send('Perdiste'.encode()) #se envía mensaje al jugador 2
     
-        if mensajeRecibido1 == 'papel' and mensajeRecibido2== 'tijera':
+        if mensajeRecibido1 == 'Papel' and mensajeRecibido2== 'Tijera':
             conn.send('Perdiste'.encode()) #se envía mensaje al jugador 1
             conn2.send('Ganaste'.encode()) #se envía mensaje al jugador 2
-        elif mensajeRecibido1 == 'papel' and mensajeRecibido2 == 'piedra':
+        elif mensajeRecibido1 == 'Papel' and mensajeRecibido2 == 'Piedra':
             conn.send('Ganaste'.encode()) #se envía mensaje al jugador 1
             conn2.send('Perdiste'.encode()) #se envía mensaje al jugador 2
 
-        if mensajeRecibido1 == 'tijera' and mensajeRecibido2 == 'piedra':
+        if mensajeRecibido1 == 'Tijera' and mensajeRecibido2 == 'Piedra':
             conn.send('Perdiste'.encode()) #se envía mensaje al jugador 1
             conn2.send('Ganaste'.encode()) #se envía mensaje al jugador 2
-        elif mensajeRecibido1 == 'tijera' and mensajeRecibido2 == 'papel': 
+        elif mensajeRecibido1 == 'Tijera' and mensajeRecibido2 == 'Papel': 
             conn.send('Ganaste'.encode()) #se envía mensaje al jugador 1
             conn2.send('Perdiste'.encode()) #se envía mensaje al jugador 2
     
