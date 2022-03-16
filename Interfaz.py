@@ -40,7 +40,6 @@ class PPTInterfaz(QMainWindow):
             self.ui.seleccion2.activated.connect(self.MostrarImagenUser)
             self.ui.imgnUser1.setVisible(False)
             self.ui.seleccion1.setVisible(False)
-        
         self.ui.btnSalir.clicked.connect(self.BtonSalir)#se establece la accion para el boton salir
         self.ui.btnJugar.setDisabled(True)#Al empezar, se tendrá bloqueada la opcion de jugar hasta que se seleccione algo
         #Visibilidad
@@ -52,9 +51,50 @@ class PPTInterfaz(QMainWindow):
         self.s.send(self.sel.encode())
         self.respuesta = self.s.recv(4096).decode()
         self.ui.msjJuego.setText(self.respuesta)
+        if self.respuesta == 'Perdiste':
+            self.perdidoA+=1
+            self.perdidoG+=1
+            pa=str(self.perdidoA)
+            pg=str(self.perdidoG)
+            if self.jugador == 'J1':
+                self.ui.RAperdido.setText(pa)
+                self.ui.RGperdido.setText(pg)
+                self.ui.RAganado2.setText(pa)
+                self.ui.RGganado2.setText(pg)
+            elif self.jugador == 'J2':
+                self.ui.RAganado.setText(pa)
+                self.ui.RGganado.setText(pg)
+                self.ui.RAperdido2.setText(pa)
+                self.ui.RGperdido2.setText(pg)
+        elif self.respuesta == 'Ganaste':
+            self.ganadoA+=1
+            self.ganadoG+=1
+            ga=str(self.ganadoA)
+            gg=str(self.ganadoG)
+            if self.jugador == 'J1':
+                self.ui.RAganado.setText(ga)
+                self.ui.RGganado.setText(gg)
+                self.ui.RAperdido2.setText(ga)
+                self.ui.RGperdido2.setText(gg)
+            elif self.jugador == 'J2':
+                self.ui.RAperdido.setText(ga)
+                self.ui.RGperdido.setText(gg)
+                self.ui.RAganado2.setText(ga)
+                self.ui.RGganado2.setText(gg)
+        elif self.respuesta == 'Empate':
+            self.empateA+=1
+            self.empateG+=1
+            ea=str(self.empateA)
+            eg=str(self.empateG)
+            self.ui.RAempate.setText(ea)
+            self.ui.RGempate.setText(eg)
+            self.ui.RAempate2.setText(ea)
+            self.ui.RGempate2.setText(eg)
+                
+
     def BtonSalir(self):#Lo que hará el boton salir cuando se presione
         print('Saliendo')
-        self.s.send('Saliendo'.encode())
+        self.s.send('salir'.encode())
         self.s.close()
         sys.exit()
     #Seleccion de imagen dependiendo de seleccion de usuario del combo box
@@ -62,62 +102,38 @@ class PPTInterfaz(QMainWindow):
     def MostrarImagenUser(self):
         if self.jugador=='J1':
             self.sel=self.ui.seleccion1.currentText()#se lee la seleccion
+        elif self.jugador=='J2':
+            self.sel=self.ui.seleccion2.currentText()
 
-            if self.sel=='Piedra':#dependiendo de la seleccion se mostrará la imgen correspondiente
-                reader=QImageReader('.\Recursos\Piedra.png')
-            elif self.sel=='Tijera':
-                reader=QImageReader('.\Recursos\Tijera.png')
-            elif self.sel=='Papel':
-                reader=QImageReader('.\Recursos\Papel.png')
-            else:
-                self.ui.imgnUser1.setVisible(False)#de no moverse, la imagen se queda invisible
-                return
+        if self.sel=='Piedra':#dependiendo de la seleccion se mostrará la imgen correspondiente
+            reader=QImageReader('.\Recursos\Piedra.png')
+        elif self.sel=='Tijera':
+            reader=QImageReader('.\Recursos\Tijera.png')
+        elif self.sel=='Papel':
+            reader=QImageReader('.\Recursos\Papel.png')
+        else:
+            self.ui.imgnUser1.setVisible(False)#de no moverse, la imagen se queda invisible
+            return
         
-            reader.setAutoTransform(True)
-            imgn=reader.read()
-
+        reader.setAutoTransform(True)
+        imgn=reader.read()
+        if self.jugador=='J1':
             self.ui.imgnUser1.setPixmap(QPixmap.fromImage(imgn))#se establece la imagen dependiendo de la seleccion
             self.ui.imgnUser1.setVisible(True)#Se hace visible la imagen
 
 
             self.ui.btnJugar.setEnabled(True)#Una vez seleccionado algo, el botn jugar se habilita
             self.ui.msjJuego.clear()
-            return self.sel
         elif self.jugador=='J2':
-            self.sel=self.ui.seleccion2.currentText()
-
-            if self.sel=='Piedra':
-                reader=QImageReader('.\Recursos\Piedra.png')
-            elif self.sel=='Tijera':
-                reader=QImageReader('.\Recursos\Tijera.png')
-            elif self.sel=='Papel':
-                reader=QImageReader('.\Recursos\Papel.png')
-            else:
-                self.ui.imgnUser2.setVisible(False)
-                return
-        
-            reader.setAutoTransform(True)
-            imgn=reader.read()
 
             self.ui.imgnUser2.setPixmap(QPixmap.fromImage(imgn))
             self.ui.imgnUser2.setVisible(True)
 
             self.ui.btnJugar.setEnabled(True)
             self.ui.msjJuego.clear()
-        
-            return self.sel
-        else:
-            return self.sel
 
 if __name__ == '__main__':
 
-    # s = socket.socket()
-
-    # server_host = 'localhost'
-    # server_port = 9999
-
-    # s.connect((server_host, server_port))
-    # respuesta = s.recv(4096).decode()
     app=QApplication()
     juego_ppt=PPTInterfaz()
     juego_ppt.show()
