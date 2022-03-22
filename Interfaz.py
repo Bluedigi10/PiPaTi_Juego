@@ -3,7 +3,7 @@ from form import *
 from ppt import pipati as ppt
 from PySide2.QtWidgets import QApplication, QMainWindow
 from PySide2.QtGui import QImageReader
-
+import json
 import socket
 import sys
 
@@ -17,6 +17,9 @@ class PPTInterfaz(QMainWindow):
     ganadoG=0
     empateG=0
     perdidoG=0
+    ganadoC=0
+    empateC=0
+    perdidoC=0
     s = socket.socket()#Se inicia los puertos para la conexion como cliente
     server_host = 'localhost'
     server_port = 9999
@@ -27,8 +30,16 @@ class PPTInterfaz(QMainWindow):
         self.ppt=ppt()#se inicializa la interfaz
         print("INICIANDO")
         self.s.connect((self.server_host, self.server_port))#se inicia la conexion con el server
-        self.jugador = self.s.recv(4096).decode()#Se recibe si eres J1(jugador 1) o J2(jugador 2)
+        dato = self.s.recv(4096).decode()#Se recibe si eres J1(jugador 1) o J2(jugador 2)
+        mensajeR=json.loads(dato)
+        self.jugador=mensajeR[0]
         
+        self.ganadoC=mensajeR[1]
+        RgGan=str(self.ganadoC)
+        self.empateC=mensajeR[2]
+        RgEmp=str(self.empateC)
+        self.perdidoC=mensajeR[3]
+        RgPer=str(self.perdidoC)
         #Se establecen las señales de los botones y combobox
         self.ui.btnJugar.clicked.connect(self.BtonJugar)#Se conecta el boton de la interfaz con lo que hara
         #Dependiendo si se es J1 o J2 se bloquea la comboBox contraria
@@ -36,10 +47,18 @@ class PPTInterfaz(QMainWindow):
             self.ui.seleccion1.activated.connect(self.MostrarImagenUser)#Se hace la conexion, si eliges tijera, te muestra la imagen
             self.ui.imgnUser2.setVisible(False)#Se bloquea la imagen del oponente
             self.ui.seleccion2.setVisible(False)#Se bloquea la comboBox del J2
+
+            self.ui.RGganado2.setText(RgGan)
+            self.ui.RGempate2.setText(RgEmp)
+            self.ui.RGperdido2.setText(RgPer)
         if self.jugador=='J2':
             self.ui.seleccion2.activated.connect(self.MostrarImagenUser)
             self.ui.imgnUser1.setVisible(False)
             self.ui.seleccion1.setVisible(False)
+
+            self.ui.RGganado.setText(RgGan)
+            self.ui.RGempate.setText(RgEmp)
+            self.ui.RGperdido.setText(RgPer)
         self.ui.btnSalir.clicked.connect(self.BtonSalir)#se establece la accion para el boton salir
         self.ui.btnJugar.setDisabled(True)#Al empezar, se tendrá bloqueada la opcion de jugar hasta que se seleccione algo
         #Visibilidad
@@ -48,53 +67,70 @@ class PPTInterfaz(QMainWindow):
    #Acciones Botones
     def BtonJugar(self):#La accion que hará el boton jugar cuando se presione
         print("listo para jugar")
-        self.s.send(self.sel.encode())
-        self.respuesta = self.s.recv(4096).decode()
+        dato=[self.sel,self.ganadoG,self.empateG,self.perdidoG]
+        dato1=json.dumps(dato)
+        self.s.send(dato1.encode())
+        mensajeR = self.s.recv(4096).decode()
+        dato=json.loads(mensajeR)
+        self.respuesta=dato[0]
         self.ui.msjJuego.setText(self.respuesta)
         if self.respuesta == 'Perdiste':
             self.perdidoA+=1
             self.perdidoG+=1
+            self.ganadoC+=1
+            gc=str(self.ganadoC)
             pa=str(self.perdidoA)
             pg=str(self.perdidoG)
             if self.jugador == 'J1':
                 self.ui.RAperdido.setText(pa)
                 self.ui.RGperdido.setText(pg)
                 self.ui.RAganado2.setText(pa)
-                self.ui.RGganado2.setText(pg)
+                self.ui.RGganado2.setText(gc)
             elif self.jugador == 'J2':
                 self.ui.RAganado.setText(pa)
-                self.ui.RGganado.setText(pg)
+                self.ui.RGganado.setText(gc)
                 self.ui.RAperdido2.setText(pa)
                 self.ui.RGperdido2.setText(pg)
         elif self.respuesta == 'Ganaste':
             self.ganadoA+=1
             self.ganadoG+=1
+            self.perdidoC+=1
+            pc=str(self.perdidoC)
             ga=str(self.ganadoA)
             gg=str(self.ganadoG)
             if self.jugador == 'J1':
                 self.ui.RAganado.setText(ga)
                 self.ui.RGganado.setText(gg)
                 self.ui.RAperdido2.setText(ga)
-                self.ui.RGperdido2.setText(gg)
+                self.ui.RGperdido2.setText(pc)
             elif self.jugador == 'J2':
                 self.ui.RAperdido.setText(ga)
-                self.ui.RGperdido.setText(gg)
+                self.ui.RGperdido.setText(pc)
                 self.ui.RAganado2.setText(ga)
                 self.ui.RGganado2.setText(gg)
         elif self.respuesta == 'Empate':
             self.empateA+=1
             self.empateG+=1
+            self.empateC+=1
+            ec=str(self.empateC)
             ea=str(self.empateA)
             eg=str(self.empateG)
-            self.ui.RAempate.setText(ea)
-            self.ui.RGempate.setText(eg)
-            self.ui.RAempate2.setText(ea)
-            self.ui.RGempate2.setText(eg)
-                
+            if self.jugador == 'J1':
+                self.ui.RAempate.setText(ea)
+                self.ui.RGempate.setText(eg)
+                self.ui.RAempate2.setText(ea)
+                self.ui.RGempate2.setText(ec)
+            elif self.jugador == 'J2':
+                self.ui.RAempate.setText(ea)
+                self.ui.RGempate.setText(ec)
+                self.ui.RAempate2.setText(ea)
+                self.ui.RGempate2.setText(eg)
 
     def BtonSalir(self):#Lo que hará el boton salir cuando se presione
         print('Saliendo')
-        self.s.send('salir'.encode())
+        dato=['salir',self.ganadoG,self.empateG,self.perdidoG]
+        dato1=json.dumps(dato)
+        self.s.send(dato1.encode())
         self.s.close()
         sys.exit()
     #Seleccion de imagen dependiendo de seleccion de usuario del combo box
